@@ -1,6 +1,9 @@
 # Ignore virtual environment
 /env
 
+# Credentials file
+credentials.txt
+
 # Ignore environment variables file
 .env
 
