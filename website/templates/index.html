@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <h1>Welcome to our website!</h1>
+    {% if user %}
+    <p>Congratulations, you have earned {{ user.gold }} gold and {{ user.diamond }} diamonds!</p>
+    <h2>Your Rewards</h2>
+
+    <!-- Obtained Rewards Section -->
+    <div class="obtained-rewards">
+        <h3>Obtained Rewards</h3>
+        <ul>
+            {% for reward in rewards_info %}
+            {% if reward.status == "claimed" %}
+            <li>
+                Quest: {{ reward.quest_name }} - Completed!
+                {% if reward.quest_name == "first-signup" %}
+                (Earned 20 gold)
+                {% else %}
+                (Earned 10 diamonds x{{ reward.times_completed }})
+                {% endif %}
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Ongoing Quests Section -->
+    <div class="ongoing-quests">
+        <h3>Ongoing Quests</h3>
+        <ul>
+            {% for reward in rewards_info %}
+            {% if reward.status == "not_claimed" %}
+            <li>
+                Quest: {{ reward.quest_name }} - Progress: {{ reward.progress }}/{{ reward.streak }}
+                {% if reward.progress >= reward.streak %}
+                <form method="POST" action="{{ url_for('auth.claim_reward') }}" class="inline-claim-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="quest_id" value="{{ reward.quest_id }}">
+                    <button type="submit">Claim Reward</button>
+                </form>
+                {% endif %}
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Available Quests Section -->
+    <div class="available-quests">
+        <h3>Available Quests</h3>
+        <ul>
+            {% for quest in available_quests %}
+            <li>
+                {{ quest.name }}: {{ quest.description }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% else %}
+    <p>Please log in or sign up to use our website</p>
+    <a href="{{ url_for('auth.login') }}">Log in</a>
+    <a href="{{ url_for('auth.signup') }}">Sign up</a>
+    {% endif %}
+</body>
+
+</html>
